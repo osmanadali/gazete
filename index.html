@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MANŞET</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Old+Standard+TT:ital@0;1&family=Courier+Prime&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#0b0907;color:#e4d6b5;min-height:100%}
+body{font:17px/1.55 'Courier Prime','Courier New',monospace;-webkit-tap-highlight-color:transparent;user-select:none}
+#game{max-width:980px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:10px;cursor:pointer}
+#stage{position:relative;aspect-ratio:16/9;background:#000;overflow:hidden;border:1px solid #3a2e20;box-shadow:0 0 80px #000}
+#stage:before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 45%,#000c 100%);pointer-events:none;z-index:3}
+#stage:after{content:"";position:absolute;inset:-50%;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");opacity:.22;mix-blend-mode:overlay;pointer-events:none;z-index:4;animation:gr .5s steps(4) infinite}
+@keyframes gr{0%{transform:translate(0,0)}25%{transform:translate(-3%,2%)}50%{transform:translate(2%,-3%)}75%{transform:translate(-2%,-2%)}}
+#scene svg{width:100%;height:100%;display:block}
+#fade,#card{position:absolute;inset:0;background:#000;z-index:5;opacity:0;pointer-events:none;transition:opacity .55s}
+#fade.on,#card.on{opacity:1}
+#card{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+#card b{font:900 clamp(26px,6vw,52px) 'Playfair Display',Georgia,serif;letter-spacing:.18em}
+#card span{color:#d9a441;letter-spacing:.3em;font-size:13px;margin-top:8px}
+.shake{animation:sh .5s}@keyframes sh{20%{transform:translate(-8px,3px)}40%{transform:translate(7px,-4px)}60%{transform:translate(-5px,2px)}80%{transform:translate(4px,-2px)}}
+#nar{min-height:128px;padding:16px 6px 4px}
+#nar b{display:block;color:#d9a441;font-size:13px;letter-spacing:.2em;margin-bottom:2px}
+#nar.hint{color:#8d7f63;font-style:italic}
+#nar .nx{display:none;color:#d9a441;margin-left:6px;animation:bl 1s infinite}
+#nar.done .nx{display:inline}@keyframes bl{50%{opacity:.2}}
+#ch{display:flex;flex-direction:column;gap:8px;padding:0 6px 10px;cursor:default}
+button,input{font:inherit;color:#e4d6b5;background:#17110c;border:1px solid #5a4630;padding:10px 14px;text-align:left;cursor:pointer;transition:.2s}
+button:hover{background:#d9a441;color:#0b0907;border-color:#d9a441}
+input{cursor:text;user-select:text;width:100%}
+.pl{fill:none;stroke:#d9a441;stroke-width:2;animation:pl 1.4s infinite;transform-box:fill-box;transform-origin:center}
+@keyframes pl{from{transform:scale(1);opacity:1}to{transform:scale(3.4);opacity:0}}
+.mk{cursor:pointer}
+.smk{fill:none;stroke:#cfc4a8;stroke-width:2;opacity:.5;stroke-dasharray:6 8;animation:sm 3s linear infinite}@keyframes sm{to{stroke-dashoffset:-56}}
+.fl{animation:fk .18s infinite alternate}.fl2{animation:fk .27s infinite alternate-reverse}@keyframes fk{from{opacity:.55}to{opacity:1}}
+.ov{position:fixed;inset:0;z-index:20;background:#060504f2;display:none;align-items:center;justify-content:center;flex-direction:column;padding:16px;overflow:auto;cursor:default}
+.ov.on{display:flex}
+.np{width:min(94vw,580px);background:#e4d6b5;color:#1a1410;padding:20px 22px;font-family:'Old Standard TT',Georgia,serif;transform:rotate(-.8deg);box-shadow:0 20px 70px #000,inset 0 0 60px #b9a57a;animation:drop .7s cubic-bezier(.2,1.3,.4,1)}
+@keyframes drop{from{transform:translateY(-60px) rotate(6deg) scale(1.15);opacity:0}}
+.mast{font:900 clamp(24px,6vw,36px) 'Playfair Display',Georgia,serif;text-align:center;letter-spacing:2px;border-bottom:3px double #1a1410;padding-bottom:4px}
+.dl{display:flex;justify-content:space-between;font-size:11px;border-bottom:1px solid #1a1410;padding:3px 0;text-transform:uppercase;letter-spacing:1px}
+.np h1{font:900 clamp(25px,7vw,46px)/1.03 'Playfair Display',Georgia,serif;margin:14px 0 8px;text-align:center;word-break:break-word}
+.sub{font-style:italic;font-size:16px;line-height:1.35;text-align:center;margin-bottom:12px}
+.cols{display:grid;grid-template-columns:1.25fr 1fr;gap:14px}
+.cols svg{width:100%;display:block;filter:contrast(1.2)}
+.cap{font-size:11px;font-style:italic;margin-top:3px}
+.fake{min-height:110px;background:repeating-linear-gradient(#1a141077 0 2px,transparent 2px 9px)}
+.ov>button{margin-top:22px}
+#title h1{font:900 clamp(48px,14vw,120px)/1 'Playfair Display',Georgia,serif;letter-spacing:.06em;color:#e4d6b5}
+#title p,#end p{max-width:520px;text-align:center;color:#a8997a;margin:14px 0}
+#title hr{width:min(80vw,460px);border:0;border-top:3px double #5a4630;margin:10px 0}
+#end h2{font:900 clamp(30px,8vw,60px) 'Playfair Display',Georgia,serif;letter-spacing:.1em;text-align:center}
+#end small{color:#d9a441;letter-spacing:.3em}
+#snd{position:fixed;top:8px;right:8px;z-index:30;padding:4px 10px;opacity:.6}
+</style></head><body>
+<button id="snd">♪</button>
+<div id="game"><div id="stage"><div id="scene"></div><div id="card"><b></b><span></span></div><div id="fade"></div></div>
+<div id="nar"></div><div id="ch"></div></div>
+<div class="ov" id="pov"></div>
+<div class="ov on" id="title"><small style="letter-spacing:.4em;color:#d9a441">TEK NÜSHALIK BİR HİKÂYE</small><hr><h1>MANŞET</h1><hr>
+<p>Her sabah kapına bir gazete gelir.<br>Manşette ne yazıyorsa, o gün başına gelir.</p><button id="go">Gazeteyi al ▸</button>
+<p style="font-size:12px">~10 dakika · 4 son · ses önerilir</p></div>
+<div class="ov" id="end"></div>
+<script>
+const $=s=>document.querySelector(s),scene=$('#scene'),nar=$('#nar'),ch=$('#ch'),stage=$('#stage');
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+let S={},tap=null,AC,mute=0;
+$('#game').onclick=()=>tap&&tap();ch.onclick=e=>e.stopPropagation();
+
+/* ---------- ses ---------- */
+function beep(f,d,v,type='sine',t0=0){if(!AC||mute)return;const t=AC.currentTime+t0,o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d)}
+const tick=()=>beep(1500+Math.random()*500,.02,.01,'square');
+const knock=n=>{for(let i=0;i<n;i++){beep(95,.13,.6,'sine',i*.34);beep(190,.05,.2,'triangle',i*.34)}};
+const bell=()=>{beep(880,1.4,.12,'triangle');beep(1320,1,.05,'sine')};
+const boom=()=>{beep(55,.9,.7,'sawtooth');beep(41,1.2,.6,'sine')};
+function drone(){[55,55.6,82.4].forEach(f=>{const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;g.gain.value=.025;o.connect(g).connect(AC.destination);o.start()})}
+$('#snd').onclick=e=>{e.stopPropagation();mute=!mute;$('#snd').style.opacity=mute?.25:.6;AC&&(mute?AC.suspend():AC.resume())};
+
+/* ---------- çizim ---------- */
+const hand=(cx,cy,l,deg,w)=>{const a=(deg-90)*Math.PI/180;return `<line x1="${cx}" y1="${cy}" x2="${cx+l*Math.cos(a)}" y2="${cy+l*Math.sin(a)}" stroke="#0c0906" stroke-width="${w}" stroke-linecap="round"/>`};
+const fig=(x,y,s,c)=>`<g transform="translate(${x} ${y}) scale(${s})" fill="${c}"><ellipse cy="-52" rx="13" ry="3"/><rect x="-8" y="-62" width="16" height="10"/><circle cy="-44" r="7"/><path d="M-12-36h24l5 46h-34z"/><rect x="-9" y="10" width="7" height="24"/><rect x="2" y="10" width="7" height="24"/></g>`;
+const woman=(x,y,s,c,dog=1)=>`<g transform="translate(${x} ${y}) scale(${s})" fill="${c}"><circle cy="-50" r="7"/><path d="M-5-43h10l12 50h-34z"/><rect x="-6" y="7" width="4" height="26"/><rect x="2" y="7" width="4" height="26"/>${dog?'<path d="M22 20h26v-8h8v8l-2 4h-6v10h-4V24H30v10h-4V24z"/><path d="M8-20 48 14" stroke="'+c+'" stroke-width="1.5"/>':''}</g>`;
+const mark=(x,y)=>`<g class="mk" id="mk"><circle cx="${x}" cy="${y}" r="42" fill="transparent"/><circle class="pl" cx="${x}" cy="${y}" r="10"/><circle cx="${x}" cy="${y}" r="4.5" fill="#d9a441"/></g>`;
+const MK={perde:[145,165],lavabo:[472,205],kapi:[714,225],ocak:[585,262],sigara:[490,362],gazete:[292,366]};
+
+function room(){const o=S.curtain,t=S.t||[9,17],m=S.mark&&MK[S.mark];return `<svg viewBox="0 0 800 450">
+<defs><linearGradient id="wl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${o?'#3d2e1f':'#1d1611'}"/><stop offset="1" stop-color="#120d0a"/></linearGradient></defs>
+<rect width="800" height="450" fill="url(#wl)"/><rect y="335" width="800" height="115" fill="#0c0906"/>
+<rect x="60" y="70" width="170" height="190" fill="${o?'#d8b877':'#241b14'}"/>
+${o?`<path d="M60 215h20v-40h25v40h30v-60h22v60h40v-30h33v75H60z" fill="#9a7742"/><rect x="60" y="234" width="170" height="26" fill="#5c4526"/>${S.woman?woman(140,244,.42,'#22170c',S.woman>1?0:1):''}`:''}
+<path d="M145 70v190M60 160h170" stroke="#0c0906" stroke-width="5"/><rect x="54" y="64" width="182" height="202" fill="none" stroke="#0c0906" stroke-width="8"/>
+${o?`<path d="M48 58h36q-7 100 0 214H48zM242 58h-36q7 100 0 214h36z" fill="#5a2a1c"/><path d="M84 266h146l190 184H40z" fill="#d8b877" opacity=".1"/>`:`<path d="M48 58h99v214H48zM143 58h99v214h-99z" fill="#4a2217" stroke="#2c130c" stroke-width="2"/>`}
+<circle cx="320" cy="115" r="27" fill="#d8c9a3" stroke="#0c0906" stroke-width="5"/>${hand(320,115,13,t[0]*30+t[1]/2,3.5)}${hand(320,115,20,t[1]*6,2)}
+<rect x="440" y="95" width="64" height="88" rx="4" fill="#56625e" stroke="#0c0906" stroke-width="5"/><circle cx="472" cy="133" r="13" fill="#252b29"/><path d="M448 181q24-44 48 0z" fill="#252b29"/>
+<path d="M432 205h80l-8 22h-64z" fill="#b9ad92"/><rect x="468" y="227" width="8" height="108" fill="#2a211a"/>
+<rect x="545" y="248" width="80" height="87" fill="#2a2420" stroke="#0c0906" stroke-width="3"/><ellipse cx="585" cy="246" rx="26" ry="5" fill="#0c0906"/><rect x="606" y="243" width="34" height="4" fill="#0c0906"/>
+<rect x="668" y="100" width="92" height="235" fill="#33241a" stroke="#0c0906" stroke-width="6"/><rect x="682" y="116" width="64" height="88" fill="none" stroke="#22170f" stroke-width="3"/><circle cx="684" cy="228" r="5" fill="#d9a441"/><rect x="672" y="333" width="84" height="3" fill="#d9a441" opacity=".5"/>
+<path d="M200 374h330l30 14H170z" fill="#4b3524"/><rect x="186" y="388" width="14" height="62" fill="#2e2015"/><rect x="530" y="388" width="14" height="62" fill="#2e2015"/>
+${S.paper?`<g transform="translate(262 362) skewX(-24)"><rect width="84" height="14" fill="#e4d6b5"/><rect x="6" y="3" width="54" height="3.5" fill="#1a1410"/><rect x="6" y="9" width="70" height="1.5" fill="#1a141088"/></g>`:''}
+${S.food?`<ellipse cx="392" cy="376" rx="34" ry="8" fill="#cfc4a8"/><ellipse cx="382" cy="374" rx="8" ry="3" fill="#d9a441"/><ellipse cx="402" cy="376" rx="8" ry="3" fill="#d9a441"/><path d="M438 347h18l-3 27h-12z" fill="#a8321f" opacity=".9"/>${S.food>1?'<path d="M462 349h18l-3 27h-12z" fill="#a8321f" opacity=".9"/>':''}`:''}
+${S.smoke?`<ellipse cx="500" cy="378" rx="15" ry="4" fill="#777"/><rect x="494" y="373" width="20" height="3" fill="#e4d6b5" transform="rotate(-14 494 373)"/><path class="smk" d="M514 366q-14-30 4-56t-8-70q-10-30 6-60"/>`:''}
+${m?mark(m[0],m[1]):''}</svg>`}
+
+const SKY=`<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b5330"/><stop offset=".7" stop-color="#c9a15c"/><stop offset="1" stop-color="#3a2a17"/></linearGradient></defs><rect width="800" height="450" fill="url(#sk)"/><circle cx="640" cy="120" r="46" fill="#e4d6b5" opacity=".35"/>
+<path d="M0 340V230h44v-34h30v54h52v-84h22v84h60v-44h50v64h70V176h14v-32l11-22 11 22v32h14v124h60v-70h40v-40h30v110h66v-60h44v-36h26v96h56V340z" fill="#3a2a17" opacity=".75"/><rect y="335" width="800" height="115" fill="#17100a"/>`;
+const FOG=`<rect y="250" width="800" height="110" fill="#c9a15c" opacity=".13"/>`;
+function outside(k,p){let b='';
+if(k=='tram')b=`${SKY}<path d="M0 385h800M0 400h800" stroke="#5a4630" stroke-width="3"/>${p?`<g transform="translate(300 268) rotate(9)"><rect width="330" height="110" rx="10" fill="#7a2418" stroke="#0c0906" stroke-width="4"/><rect y="62" width="330" height="48" fill="#d8c9a3" opacity=".25"/>${[0,1,2,3,4].map(i=>`<rect x="${18+i*62}" y="14" width="46" height="40" fill="${i%2?'#d9a441':'#0c0906'}" opacity=".85"/>`).join('')}<circle cx="60" cy="112" r="14" fill="#0c0906"/><circle cx="270" cy="112" r="14" fill="#0c0906"/><path d="M165 0V-40" stroke="#0c0906" stroke-width="4"/></g><path d="M0 228h800" stroke="#0c0906" stroke-width="1.5"/>${[80,120,160,640,690,730].map((x,i)=>fig(x,372+i%2*8,.9,'#0c0906')).join('')}${fig(230,392,1.15,'#0c0906')}<rect x="244" y="368" width="14" height="18" fill="#e4d6b5" transform="rotate(12 244 368)"/>`:`<path d="M0 228h800" stroke="#0c0906" stroke-width="1.5"/><rect x="380" y="386" width="30" height="20" fill="#e4d6b5" transform="rotate(-18 380 386)"/>${fig(120,392,1.15,'#0c0906')}${fig(690,370,.8,'#0c0906')}`}${FOG}`;
+if(k=='clock'){const t=p?[9,17]:[9,5];b=`${SKY}<rect x="360" y="110" width="80" height="230" fill="#241a10"/><path d="M350 110h100l-50-70z" fill="#241a10"/><rect x="388" y="296" width="24" height="44" fill="${p?'#0c0906':'#d9a441'}"/><circle cx="400" cy="160" r="30" fill="#e4d6b5" stroke="#0c0906" stroke-width="5"/>${hand(400,160,14,t[0]*30+t[1]/2,4)}${hand(400,160,23,t[1]*6,2.5)}${woman(250,378,1,'#0c0906',p?1:0)}${p?[90,140,560,620,680].map((x,i)=>fig(x,376+i%2*8,.9,'#0c0906')).join('')+fig(330,392,1.15,'#0c0906'):fig(150,392,1.15,'#0c0906')}${FOG}`}
+if(k=='han')b=`${SKY}<rect x="230" y="150" width="380" height="190" fill="#241a10"/><path d="M220 150h400l-20-22H240z" fill="#1a120b"/>${[0,1,2,3,4].map(i=>`<rect class="${p?(i%2?'fl':'fl2'):''}" x="${256+i*72}" y="176" width="40" height="52" rx="20" fill="${p?'#ff8a1f':'#0c0906'}"/>`).join('')}<path d="M380 340v-70q40-40 80 0v70z" fill="${p?'#ff8a1f':'#0c0906'}" class="${p?'fl':''}"/>${p?`<path class="fl" d="M250 128q20-60 40-20 10-70 50-10 30-80 60 0 30-50 50 6 30-70 60-4 20-40 40 28z" fill="#ff8a1f"/><path class="fl2" d="M290 128q20-40 40-6 30-60 70 0 30-40 60 2 30-40 50 4z" fill="#ffd27a"/><rect class="fl2" width="800" height="450" fill="#ff6a00" opacity=".14"/>${[70,120,660,720].map((x,i)=>fig(x,378+i%2*8,.9,'#0c0906')).join('')}`:''}${fig(p?170:420,392,1.15,'#0c0906')}${FOG}`;
+if(k=='press')b=`<rect width="800" height="450" fill="#0d0a07"/><path d="M400 0v70" stroke="#3a2e20" stroke-width="3"/><path d="M385 70h30l8 14h-46z" fill="#5a4630"/><path d="M377 84h46l170 366H207z" fill="#d9a441" opacity=".13"/><rect y="370" width="800" height="80" fill="#070504"/>
+${[40,170,620].map(x=>`<path d="M${x} 370v-120q60-30 120 0v120z" fill="#1f1812" stroke="#2c2218" stroke-width="2"/>`).join('')}
+<rect x="330" y="270" width="140" height="100" fill="#2a2018" stroke="#0c0906" stroke-width="3"/><circle cx="350" cy="250" r="34" fill="none" stroke="#3a2e20" stroke-width="8"/><rect x="352" y="282" width="96" height="30" fill="#b9ad92"/>${[0,1,2].map(i=>`<rect x="358" y="${288+i*8}" width="${84-i*14}" height="4" fill="#1a1410"/>`).join('')}
+${fig(540,392,1.2,'#0c0906')}<rect x="552" y="352" width="20" height="26" fill="#e4d6b5" opacity=".8"/>`;
+return `<svg viewBox="0 0 800 450">${b}</svg>`}
+
+/* ---------- motor ---------- */
+const R=()=>scene.innerHTML=room();
+function say(t,who){return new Promise(r=>{ch.innerHTML='';nar.className='';nar.innerHTML=(who?`<b>${who}</b>`:'')+'<span></span><i class="nx">▾</i>';const sp=nar.querySelector('span');let i=0,done=0;
+const fin=()=>{clearInterval(iv);sp.textContent=t;done=1;nar.classList.add('done')};
+const iv=setInterval(()=>{sp.textContent=t.slice(0,++i);if(i%3==0)tick();if(i>=t.length)fin()},20);
+tap=()=>{if(!done)fin();else{tap=null;r()}}})}
+const says=async(...a)=>{for(const t of a)await say(t)};
+function hot(id,lab){return new Promise(r=>{S.mark=id;R();nar.className='hint';nar.textContent='▸ '+lab;$('#mk').onclick=e=>{e.stopPropagation();S.mark=null;R();beep(300,.08,.1,'triangle');r()}})}
+async function H(id,lab,fn,...txt){await hot(id,lab);fn&&fn();R();await says(...txt)}
+function choose(opts){return new Promise(r=>{nar.classList.remove('done');ch.innerHTML='';opts.forEach((o,i)=>{const b=document.createElement('button');b.textContent='▸ '+o;b.onclick=()=>{ch.innerHTML='';r(i)};ch.appendChild(b)})})}
+function askText(){return new Promise(r=>{ch.innerHTML='<input id="ti" maxlength="60" placeholder="Manşetini yaz…"><button>▸ Kurşuna dök</button>';const go=()=>{const v=$('#ti').value.trim();if(v){ch.innerHTML='';r(v)}};ch.querySelector('button').onclick=go;$('#ti').onkeydown=e=>e.key=='Enter'&&go();$('#ti').focus()})}
+async function fade(fn){$('#fade').classList.add('on');await wait(600);fn();nar.textContent='';await wait(250);$('#fade').classList.remove('on');await wait(500)}
+async function card(a,b){nar.textContent='';ch.innerHTML='';const c=$('#card');c.querySelector('b').textContent=a;c.querySelector('span').textContent=b;c.classList.add('on');await wait(700);S={day:S.day,t:S.t,woman:1};R();bell();await wait(1900);c.classList.remove('on');await wait(600)}
+const shake=()=>{stage.classList.remove('shake');void stage.offsetWidth;stage.classList.add('shake')};
+function paper(p){return new Promise(r=>{const f=p.f,o=$('#pov');beep(700,.15,.05,'sawtooth');
+o.innerHTML=`<div class="np"><div class="mast">GÜNLÜK HAKİKAT</div><div class="dl"><span>${p.d}</span><span>Tek nüsha</span><span>50 Kuruş</span></div><h1>${p.h}</h1><div class="sub">${p.s}</div>
+<div class="cols"><div><svg viewBox="0 0 200 120"><rect width="200" height="120" fill="#8d8571"/><rect y="86" width="200" height="34" fill="#5d5747"/>${[14,34,52,74,96,170,188].map((x,i)=>`<circle cx="${x}" cy="${78+i%3*4}" r="9" fill="#3b372d"/><rect x="${x-9}" y="${86+i%3*4}" width="18" height="34" fill="#3b372d"/>`).join('')}${f?fig(138,114-34*f,f,'#14110c'):''}${f>1.2?'<circle cx="138" cy="'+(114-78*f)+'" r="'+4*f+'" fill="#8d8571" opacity=".5"/>':''}</svg><div class="cap">${p.c}</div></div><div class="fake"></div></div></div><button>Gazeteyi katla ▸</button>`;
+o.classList.add('on');o.querySelector('button').onclick=()=>{o.classList.remove('on');r()}})}
+function ending(name,line){const e=$('#end');e.innerHTML=`<small>SON</small><h2>${name}</h2><p>${line}</p><p style="font-size:13px">Dört sondan biri. Son manşeti başka türlü dizmek istersen:</p><button onclick="location.reload()">Baştan oku ▸</button>`;e.classList.add('on')}
+const up=s=>s.toLocaleUpperCase('tr');
+
+/* ---------- hikâye ---------- */
+async function day1(){S.day=1;await card('PAZARTESİ','6 KASIM 1978');
+await says('Uyanıyorsun. Oda, dünün sigara dumanı kokuyor.','Duvardaki saat 09.17’yi gösteriyor. Yıllardır hep 09.17’yi gösteriyor. Tamirini hep yarına bırakıyorsun.');
+await H('perde','Perdeyi aç',()=>S.curtain=1,'Perdeyi açıyorsun. Sokak yerli yerinde. İnsanlar işine gidiyor; karşı kaldırımda bir kadın köpeğini gezdiriyor.','Köpek durup sana bakıyor. Kadın bakmıyor.');
+await H('lavabo','Yüzünü yıka',0,'Yüzüne soğuk su çarpıyorsun. Aynadaki adam elli sekiz yaşında. Kemal Soylu. Emekli.','Neyden emekli olduğunu soran olmuyor artık.');
+knock(3);await say('Tak. Tak. Tak. Her sabahki gibi, üç kere.');
+await H('kapi','Kapıyı aç',0,'Gazeteci. Yıllardır aynı çocuk; gerçi artık çocuk değil. Gazeteyi uzatıyor ama hemen bırakmıyor.','Yüzünde farklı bir bakış var bu sabah. Acıma mı? Korku mu? Çözemiyorsun.');
+await say('«Bugün dikkatli ol, Kemal Abi.»','GAZETECİ');
+S.paper=1;R();await say('Sen bir şey soramadan merdivenlerden iniyor. Gazeteyi masaya bırakıyorsun. Önce kahvaltı. Düzen, düzendir.');
+await H('ocak','Kahvaltını hazırla',()=>S.food=1,'İki yumurta, tereyağında. Bardağa bir sallama çay. Demlik, Nermin gittiğinden beri dolapta duruyor.');
+await H('sigara','Bir sigara yak',()=>S.smoke=1,'Yumurtan bitmeden paketten bir sarı filtre çekiyorsun. Doktor bırak demişti. Doktor da öldü.');
+await hot('gazete','Gazeteyi aç');
+await paper({d:'6 Kasım 1978 Pazartesi',h:'TRAMVAY RAYDAN ÇIKTI',s:'Karaköy’de sabah faciası ucuz atlatıldı: Ölen yok. Vatman: «Rayların ortasında biri duruyordu.»',f:.55,c:'Kaza yerinde toplanan kalabalık.'});
+await says('Homurdanıyorsun: «Bu şehirde vatman diye adam mı kaldı…»','Fotoğrafta, kalabalığın gerisinde, sırtı dönük şapkalı bir adam var. Önemsemiyorsun.','Duş. Gri palto. Şapka. Çıkıyorsun.');
+await fade(()=>scene.innerHTML=outside('tram',0));
+await says('Karaköy. Sis denizden yeni kalkmış.','Gazeteyi koltuğunun altına sıkıştırmışsın. Rüzgâr bir sayfayı çekip alıyor: manşet sayfasını. Kâğıt süzülüp tramvay raylarının tam ortasına konuyor.');
+if(await choose(['Sayfayı almak için raylara yürü','Boş ver, yoluna devam et']))await say('Boş vermeye karar veriyorsun. Üç adım atıyorsun. Sonra dönüyorsun; manşetsiz gazete olmaz.');
+await say('Eğilip sayfayı alıyorsun.');bell();await say('Bir çan sesi. Çok yakından.');
+boom();shake();scene.innerHTML=outside('tram',1);
+await says('Vatmanın gözleri seninkilere değiyor. Fren. Kıvılcım. Demirin demire bağırışı.','Tramvay raydan çıkıp kaldırıma yaslanarak duruyor. Camlar kırık. Kimse ölmemiş.','Kalabalık toplanıyor. Sen en arkada, elinde bir gazete sayfasıyla öylece duruyorsun. Bir flaş patlıyor. Sırtını dönüyorsun.','Elindeki sayfaya bakıyorsun: TRAMVAY RAYDAN ÇIKTI.','Dünün haberidir bu. Öyle olmalı. Tarihe bakmıyorsun.');
+}
+async function day2(){S.day=2;await card('SALI','7 KASIM 1978');
+await say('Uyanıyorsun. Saat 09.17.');
+await H('perde','Perdeyi aç',()=>S.curtain=1,'Perde. Sokak. Kadın. Köpek. Köpek bugün sana havlıyor.');
+knock(3);await H('kapi','Kapıyı aç',()=>S.paper=1,'Gazeteci gözlerini kaçırıyor.');
+await say('«Dün… Karaköy’deydin, değil mi abi?»','GAZETECİ');
+await say('Cevap vermiyorsun. Gazetenin tarihine bakıyorsun bu sefer: 7 Kasım. Bugün.');
+await H('sigara','Kahvaltı et, sigaranı yak',()=>{S.food=1;S.smoke=1},'Yumurta. Çay. Sarı filtre. Ellerin dünkü kadar sakin değil.');
+await hot('gazete','Gazeteyi aç');
+await paper({d:'7 Kasım 1978 Salı',h:'MEYDAN SAATİ DURDU',s:'Yüz yıllık saat kulesi 09.17’de sustu. Görgü tanığı: «Kuleye önce bir köpek, ardından şapkalı bir adam girdi.»',f:.85,c:'Meydanda saate bakanlar.'});
+await says('09.17. Duvardaki saate bakıyorsun. Sonra bakmamaya karar veriyorsun.','«Bugün evden çıkmıyorum» diyorsun yüksek sesle.','Sonra paketin boşaldığını fark ediyorsun. Bakkal, meydanın öbür ucunda.');
+await fade(()=>scene.innerHTML=outside('clock',0));
+await says('Meydan. Kule saati 09.05’i gösteriyor ve tıkır tıkır işliyor. İçin rahatlıyor. Gazete de yanılabiliyormuş demek.','Karşı kaldırımın kadını burada. Köpek seni görünce tasmasından kurtuluyor, kulenin aralık kapısından içeri dalıyor.');
+await say('«Beyefendi, ne olur!»','KADIN');
+if(await choose(['Köpeğin peşinden kuleye gir','«Benim işim değil» de']))await say('«Benim işim değil» diyorsun. Kadın başını sallıyor. Sonra kendini kulenin merdivenlerinde buluyorsun; ne zaman yürüdüğünü hatırlamıyorsun.');
+await says('Yüz kırk basamak. Yukarıda çarklar, zincirler, makine yağı kokusu. Köpek bir kirişin ucunda titriyor.','Uzanıyorsun. Ayağın kayıyor. Elin tutunacak bir şey arıyor ve buluyor: bir zincir.');
+boom();shake();scene.innerHTML=outside('clock',1);
+await says('Çarklar inleyerek duruyor. Sessizlik. Yüz yıldır ilk kez.','Aşağı indiğinde bütün meydan yukarı bakıyor. 09.17.','Köpeği kadına uzatıyorsun. Teşekkür etmiyor.');
+await say('«Siz her sabah perdeden bakan adamsınız.»','KADIN');
+await say('Bir flaş daha patlıyor. Artık bütün şehir, senin odanın saatine göre yaşıyor.');
+}
+async function day3(){S.day=3;await card('ÇARŞAMBA','8 KASIM 1978');
+await say('Uyanıyorsun. Saat 09.17. Artık her yerde 09.17.');
+S.woman=2;await H('perde','Perdeyi aç',()=>S.curtain=1,'Kadın karşı kaldırımda durmuş, doğrudan pencerene bakıyor. Köpek yanında değil.');
+knock(2);await say('Tak. Tak. … Bu sabah iki kere.');
+await H('kapi','Kapıyı aç',0,'Gazeteci gazeteyi göğsüne bastırmış.');
+await say('«Bugün almasan olmaz mı abi?»','GAZETECİ');
+S.paper=1;R();await say('Gazeteyi elinden çekip alıyorsun. Kahvaltıyı beklemiyorsun bile.');
+await hot('gazete','Gazeteyi aç');
+await paper({d:'8 Kasım 1978 Çarşamba',h:'KEHRİBAR HAN KÜL OLDU',s:'Kimliği belirsiz bir adam, bekçiyi alevlerin içinden çıkardı. Yangının bir sigara izmaritinden çıktığı sanılıyor.',f:1.3,c:'Bekçiyi kurtaran adam objektiften kaçtı.'});
+await says('Fotoğraftaki adamın yüzü bu kez yarım dönük. Şapkası seninki gibi. Paltosu seninki gibi.','Kararını veriyorsun: Hana gidecek ve yangını önleyeceksin. Bir kere olsun gazete yanılacak.');
+await fade(()=>scene.innerHTML=outside('han',0));
+await says('Kehribar Han. Avluda pamuk balyaları, kâğıt topları. Bekçi kulübesinde uyukluyor. Yangın yok.','Bir saat bekliyorsun. İki saat. Hiçbir şey olmuyor. Kazandın galiba.','Farkında olmadan bir sarı filtre yakmışsın. Bitmiş bile.');
+if(await choose(['İzmariti yere at','İzmariti dikkatle cebine koy']))await say('İzmariti söndürüp paltonun cebine koyuyorsun. Akıllısın. Cebindeki delikten ise haberin yok.');
+else await say('İzmarit parmaklarından kayıp balyaların arasına düşüyor. Görmüyorsun.');
+await say('Arkanı dönüp çıkıyorsun. Sokağın başına varmadan koku geliyor.');
+boom();shake();scene.innerHTML=outside('han',1);await say('Han yanıyor. İçeriden bir öksürük duyuluyor.');
+if(await choose(['İçeri koş, bekçiyi çıkar','Uzak dur. Bu sefer manşete uyma']))await say('Uzak duruyorsun. Yumruklarını sıkıyorsun. Sonra dumanın içindesin; bacakların sana sormamış.');
+await says('Bekçiyi omzuna alıp çıkarıyorsun. Öksürüyor, yaşıyor. Kalabalık alkışlıyor. Biri adını soruyor.','Söylemiyorsun. Flaş patlarken yüzünü çeviriyorsun; ama yeterince hızlı değil.','O gece ilk kez şunu düşünüyorsun: Gazete olacakları bilmiyor. Gazete, benim ne yapacağımı biliyor.');
+}
+async function day4(){S.day=4;await card('PERŞEMBE','9 KASIM 1978');
+await say('Uyanıyorsun. 09.17.');
+S.woman=0;await H('perde','Perdeyi aç',()=>S.curtain=1,'Karşı kaldırım boş. Kadın yok. Köpek yok. Sokak, oyuncuları gelmemiş bir sahne gibi.');
+await say('Bekliyorsun. Kapı çalmıyor.');
+await H('kapi','Kapıyı aç',()=>S.paper=1,'Kimse yok. Gazete paspasın üstünde. Mürekkebi hâlâ ıslak.');
+await hot('gazete','Gazeteyi aç');
+await paper({d:'9 Kasım 1978 Perşembe',h:'GAZETE DAĞITICISI KAYIP',s:'Yirmi yıldır tek sabah aksatmayan İsmail Demir’den haber alınamıyor. Son görüldüğü yer: Babıâli’deki eski Hakikat Matbaası.',f:0,c:'Fotoğrafta bu kez kimse yok.'});
+await says('Hakikat Matbaası. Adı okuyunca midende bir şey kıpırdıyor. Otuz yıl orada çalıştın. Manşetleri sen yazardın.','Gazete on bir yıl önce kapandı.','On bir yıl önce kapanan bir gazete, bu sabah kapına nasıl geldi?','Ellerine bakıyorsun. Tırnaklarının dibinde mürekkep var. Dün de vardı. Hep vardı.');
+await fade(()=>scene.innerHTML=outside('press'));
+await says('Matbaanın kapısındaki zincir kırılmamış; açılmış. Kilidin üstünde bir anahtar duruyor. Cebini yokluyorsun: anahtarlığında bir boşluk.','İçeride tek bir lamba yanıyor. Makinelerin üstü örtülü. Biri hariç.');
+const I='İSMAİL';
+await say('«Geldin demek Kemal Usta. Ne zaman okuyacaksın diye bekliyordum.»',I);
+await say('«Kayıp falan değilim. Dün gece beni öyle dizdin. Anladım ki artık bulunmak istiyorsun.»',I);
+if(await choose(['«Bu gazeteyi kim basıyor?»','«Ben hiçbir şey dizmedim.»']))await say('«Ellerine bak usta.» Bakıyorsun. Mürekkep.',I);
+await say('«Sen basıyorsun usta. On bir yıldır, her gece.»',I);
+await say('«Gazete bir sabah 09.17’de kapandı. Patron ışıkları söndürdü, sen manşet masasından kalkmadın. O gece geri geldin. Gözlerin açıktı ama içinde sen yoktun.»',I);
+await say('«Her gece bir manşet dizer, tek nüsha basarsın. Sabah ben kapına getiririm. Bir kere getirmedim; üç gün yataktan çıkmadın. Manşetsiz yaşayamıyorsun.»',I);
+await say('«Eskiden zararsızdı. HAVA BUGÜN DE KAPALI. BAKKAL VERESİYEYİ KESTİ. Sonra Nermin Abla gitti. Manşetler büyüdü.»',I);
+await say('«Otuz yıl başkalarının hayatını birinci sayfaya taşıdın; kendi adın bir kere çıkmadı. Şimdi gece yazıyor, gündüz gidip yaşıyorsun. Tramvayı, saati, yangını… Gazete geleceği bilmiyor usta. Senin elin yazıyor, senin ayağın gidiyor.»',I);
+await say('Fotoğraflardaki adam. Sırtı dönük figüran. Her karede biraz daha yakın, biraz daha sen.');
+await say('«Bir de bu var.» Örtüsüz makinedeki dizgiyi gösteriyor.',I);
+await say('Kurşun harfler tersten okunur. Sen tersten okumayı otuz yıl önce öğrendin:');
+boom();await say('MANŞET YAZARI KEMAL SOYLU EVİNDE ÖLÜ BULUNDU');
+await say('«Dün gece dizdin. Basmadım. Yarının gazetesi bu.» Sana bir dizgi cımbızı uzatıyor. «Harf dediğin kurşun, usta. Eritilir, yeniden dökülür. Son manşeti bu sefer uyanıkken yaz.»',I);
+const c=await choose(['Dizgiye dokunma. Manşet, manşettir.','Yeniden diz: BUGÜN HİÇBİR ŞEY OLMADI','Yeniden diz: BİR ADAM, GAZETECİSİNİ ÇAYA DAVET ETTİ','Kendi manşetini diz…']);
+let own='';if(c==3){nar.className='hint';nar.textContent='Harfler elinin altında. Yarın ne olsun?';own=up(await askText())}
+await say(c?'Harfleri tek tek söküp yeniden diziyorsun. Ellerin, otuz yıldır ilk kez, ne yaptığını biliyor.':'Cımbızı tezgâha bırakıyorsun. «Bas,» diyorsun. İsmail uzun süre kıpırdamıyor.');
+return [c,own]}
+async function day5([c,own]){S.day=5;S.t=c?[9,18]:[9,17];await card('CUMA','10 KASIM 1978');S.t=c?[9,18]:[9,17];S.woman=1;R();
+const D='10 Kasım 1978 Cuma';
+if(c==0){await say('Uyanıyorsun. 09.17.');
+await H('perde','Perdeyi aç',()=>S.curtain=1,'Kadın karşı kaldırımda, köpeğiyle. Sana el sallıyor. İlk kez.');
+await H('sigara','Kahvaltı et, sigaranı yak',()=>{S.food=1;S.smoke=1},'Yumurta. Çay. Son sarı filtre. Paket boş; ne tuhaf, tam hesaplamışsın.');
+knock(3);await says('Tak. Tak. Tak.','Kalkmıyorsun. Otuz yıl manşet yazdın; bir manşetin yalan çıkmasından büyük ayıp bilmezsin.');knock(2);await says('Tak. Tak.','…');
+await paper({d:D,h:'MANŞET YAZARI KEMAL SOYLU EVİNDE ÖLÜ BULUNDU',s:'Kapanan Günlük Hakikat’in emektar manşet yazarı, kahvaltı masasında bulundu. Önünde tek nüshalık bir gazete vardı. İlk kez birinci sayfadaydı.',f:1.8,c:'Kemal Soylu (1920–1978).'});
+return ending('SON BASKI','Manşet tuttu. Hep tutardı.')}
+await says('Uyanıyorsun.','Duvardaki saate bakıyorsun. 09.18.');
+await H('perde','Perdeyi aç',()=>S.curtain=1,'Sokak. Kadın. Köpek. Köpek kuyruğunu sallıyor.');
+knock(3);
+if(c==1){await H('kapi','Kapıyı aç',()=>S.paper=1,'İsmail gazeteyi uzatıyor. Yüzünde bu sabah da farklı bir bakış var; ama bunu tanıyorsun. Buna rahatlama denir.');
+await H('sigara','Kahvaltını hazırla',()=>S.food=1,'İki yumurta. Bir çay. Sigarayı pakette bırakıyorsun.');
+await hot('gazete','Gazeteyi aç');
+await paper({d:D,h:'BUGÜN HİÇBİR ŞEY OLMADI',s:'Şehirde olağanüstü tek bir olay yaşanmadı. Tramvaylar rayında, saatler ayarında. Bir adam kahvaltısını bitirdi.',f:0,c:'Boş bir sokak. Haber değeri yok.'});
+await says('Homurdanıyorsun: «Bu da haber mi şimdi…»','Sonra yumurtanı bitiriyorsun. Sonuna kadar. Yıllardır ilk kez.');
+return ending('SAKİN BASKI','En zor yazılan manşet, hiçbir şeyin olmadığı gündür.')}
+if(c==2){await H('kapi','Kapıyı aç',0,'İsmail gazeteyi uzatıyor. Almıyorsun. Kapıyı sonuna kadar açıyorsun.','«Gir,» diyorsun. «Çay demledim. Demlikte.»');
+S.paper=1;S.food=2;R();await say('Nermin’in demliği yirmi yılın tozunu atmış, ocakta tıkırdıyor.');
+await hot('gazete','Gazeteye bak');
+await paper({d:D,h:'BİR ADAM, GAZETECİSİNİ ÇAYA DAVET ETTİ',s:'Yirmi yıllık abone ile dağıtıcısı ilk kez aynı masaya oturdu. Masada iki bardak vardı. Gazete okunmadı.',f:1.2,c:'Bu kez objektife bakıyor.'});
+await say('Gazete masada katlı duruyor. Açan olmuyor. Okumadan yaşayacağın ilk gün başlıyor.');
+return ending('İKİ BARDAK','Otuz yıl başkalarını yazdı. Sonunda biri onun kapısını çaldı ve o, açtı.')}
+await H('kapi','Kapıyı aç',()=>S.paper=1,'İsmail gazeteyi uzatıyor.');
+await say('«Bunu sen yazdın usta. Uyanıkken.»','İSMAİL');
+await hot('gazete','Gazeteyi aç');
+await paper({d:D,h:own,s:'Bu sabahın tek nüshası, yazarı tarafından uyanıkken dizildi. Olaylar gelişiyor.',f:1.5,c:'Manşetin öznesi.'});
+await says('Okuyorsun. Bu sefer homurdanmıyorsun.','Paltonu giyiyorsun. Manşetin öznesi sensin; ve ilk kez, bunu bilerek çıkıyorsun sokağa.');
+ending('YAZARIN BASKISI','«'+own+'» — ve o gün, tam da yazdığın gibi oldu.')}
+
+$('#go').onclick=async()=>{try{AC=new (window.AudioContext||window.webkitAudioContext)();drone()}catch(e){}
+$('#title').classList.remove('on');await day1();await day2();await day3();await day5(await day4())};
+S={woman:1};R();
+</script></body></html>
